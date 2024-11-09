@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+
+  courses:
+    build : ./MicroServiceProject
+    image: course
+    container_name: course-container
+    ports:
+      - "8075:8075"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+    depends_on:
+      - eurekaserver
+
+  eurekaserver:
+    build:
+      context: ./ErekaServer
+      dockerfile: Dockerfile
+    image: eureka
+    container_name: eureka-container
+    ports:
+      - "8761:8761"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+
+  api-gateway:
+    build: ./APIGateway
+    image: gateway
+    container_name: gateway-container
+    ports:
+      - "8090:8090"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka
+    depends_on:
+      - eurekaserver
+      - courses
